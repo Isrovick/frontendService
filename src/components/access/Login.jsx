@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useMain, useMainUpdate } from "../mainContext";
+import React, { useEffect, useState } from "react";
+import { useMain, useMainUpdate } from "../../mainContext";
 import axio from "axios";
 import { Navigate } from "react-router-dom";
 
@@ -8,7 +8,11 @@ export const Login = () => {
   const [password, setpassword] = useState("");
 
   const { logged, url } = useMain();
-  const { setlogged, setname } = useMainUpdate();
+  const { setlogged, setname, setAct } = useMainUpdate();
+
+  useEffect(() => {
+    setAct("Log In");
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();

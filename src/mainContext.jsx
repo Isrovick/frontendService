@@ -23,23 +23,15 @@ export function MainProvider({ children }) {
   const [url, seturl] = useState(process.env.BACKEND_URL);
   const [JWT, setJWT] = useState(localStorage.getItem(null));
   const [act, setAct] = useState("Dashboard");
-  const aux = logged
-    ? [{ name: "Dashboard", current: false }]
-    : [
-        { name: "LogIn", current: false },
-        { name: "SignUp", current: false },
-      ];
-  const [sections, setSections] = useState(aux);
 
   return (
-    <MainContext.Provider value={{ logged, user, url, JWT, act, sections }}>
+    <MainContext.Provider value={{ logged, user, url, JWT, act }}>
       <MainUpdateContext.Provider
         value={{
-          setlogged: setlogged,
-          setJWT: setJWT,
-          setname: setUser,
-          setAct: setAct,
-          setSections: setSections,
+          setlogged,
+          setJWT,
+          setAct,
+          setUser,
         }}
       >
         {children}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useMain } from "../mainContext";
+import { useMain, useMainUpdate } from "../../mainContext";
 
 const products = [
   {
@@ -31,8 +31,10 @@ const products = [
 ];
 export const Dashboard = () => {
   const { logged } = useMain();
-
-  useEffect(() => {}, []);
+  const { setAct } = useMainUpdate();
+  useEffect(() => {
+    setAct("Dashboard");
+  }, []);
   if (!logged) {
     return <Navigate to={"/login"} />;
   }

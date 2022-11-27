@@ -1,9 +1,14 @@
-import React, { useState } from "react";
-import { useMain, useMainUpdate } from "../mainContext";
+import React, { useEffect, useState } from "react";
+import { useMain, useMainUpdate } from "../../mainContext";
 
 export const Profile = () => {
   const { logged, url } = useMain();
-  const { setlogged, setname } = useMainUpdate();
+  const { setlogged, setname, setAct } = useMainUpdate();
+
+  useEffect(() => {
+    setAct("Profile");
+  }, []);
+
   const user = {
     id: 2,
     name: "Medium Stuff Satchel",
