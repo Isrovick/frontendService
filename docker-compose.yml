@@ -11,8 +11,8 @@ services:
     ports:
       - 3000:3000
     restart: always
-    environment:
-      - REACT_APP_BACKEND_URL=http://backend/api/graphql
+    env_file:
+      - .env
 
 networks:
   backend:
