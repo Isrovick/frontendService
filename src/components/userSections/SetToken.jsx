@@ -1,49 +1,54 @@
 import React, { useEffect, useState } from "react";
 import { useMain, useMainUpdate } from "../../mainContext";
 import { Navigate } from "react-router-dom";
-import { useLazyQuery } from "@apollo/client";
-import { login } from "../../gql/queries";
+import { setGithubCredentials } from "../../gql/queries";
+import { apolloClient } from "../../index";
 
-export const Login = () => {
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
+export const SetToken = () => {
+  const [username, setusername] = useState("");
+  const [token, settoken] = useState("");
 
-  const { logged } = useMain();
-  const { setLogged, setAct, setUser, setJWT } = useMainUpdate();
-  const [loginLazy, { data, loading, error }] = useLazyQuery(
-    login(email, password)
-  );
-
+  const { logged, user } = useMain();
+  const { setAct } = useMainUpdate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState(false);
   useEffect(() => {
-    setAct("Log In");
-  }, [data, loading, error]);
+    setAct("Github Credentials");
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    loginLazy();
+    setLoading(true);
+    apolloClient
+      .mutate({
+        mutation: setGithubCredentials(user.id, username, token),
+      })
+      .then((res) => {
+        setLoading(false);
+        setData(true);
+        console.log(res);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(true);
+        console.log(err);
+      });
   };
-  const HandleEmail = (e) => {
-    setemail(e.target.value);
+  const HandleUserName = (e) => {
+    setusername(e.target.value);
   };
 
-  const HandlePassword = (e) => {
-    setpassword(e.target.value);
+  const HandleToken = (e) => {
+    settoken(e.target.value);
   };
 
-  if (logged) {
-    return <Navigate to={"/Dashboard"} />;
+  if (!logged) {
+    return <Navigate to={"/Login"} />;
   }
-  if (loading) return "LOADING";
-  if (error) return `Error! ${error}`;
-  if (data) {
-    const { token, user } = data.login;
-    localStorage.setItem("JWT", token);
-    setJWT(token);
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
-    setLogged(true);
-    return <Navigate to={"/Dashboard"} />;
-  }
+  if (loading) return "Loading...";
+  if (error) return `Error inserting credentials! ${error}`;
+  if (data) return "Credentials inserted successfully!";
   return (
     <div>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -52,21 +57,21 @@ export const Login = () => {
           <div className="col-sm"></div>
           <div className="col-sm">
             <form onSubmit={handleSubmit}>
-              <div className="form-group my-2">Log In</div>
+              <div className="form-group my-2">Github Credentials</div>
               <div className="form-group my-2">
                 <input
-                  type="email"
+                  type="username"
                   className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Email"
-                  onChange={HandleEmail}
+                  placeholder="Username"
+                  onChange={HandleUserName}
                 />
               </div>
               <div className="form-group my-2">
                 <input
-                  type="password"
+                  type="token"
                   className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Password"
-                  onChange={HandlePassword}
+                  placeholder="Token"
+                  onChange={HandleToken}
                 />
               </div>
               <div className="form-group my-2">
@@ -74,7 +79,7 @@ export const Login = () => {
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   type="submit"
                 >
-                  Login
+                  Set Token
                 </button>
               </div>
             </form>

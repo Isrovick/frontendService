@@ -8,8 +8,11 @@ export const Header = () => {
   const { logged, user, act } = useMain();
 
   const updateSections = () => {
-    return logged
-      ? [{ name: "Dashboard", current: false }]
+    return logged && !!localStorage.getItem("JWT")
+      ? [
+          { name: "Dashboard", current: false },
+          { name: "Favourites", current: false },
+        ]
       : [
           { name: "LogIn", current: false },
           { name: "SignUp", current: false },

@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useMain, useMainUpdate } from "../../mainContext";
-import axio from "axios";
 import { Navigate } from "react-router-dom";
+import { apolloClient } from "../../index";
+import { signUp } from "../../gql/queries";
 
 export const SignUp = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [password_confirmaton, setpassword_confirmaton] = useState("");
-  const [firstname, setfirstname] = useState("");
-  const [lastname, setlastname] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState(false);
 
-  const { logged, url } = useMain();
-  const { setLogged, setAct } = useMainUpdate();
+  const { logged } = useMain();
+  const { setLogged, setAct, setUser, setJWT } = useMainUpdate();
 
   useEffect(() => {
     setAct("Sign up");
@@ -19,32 +22,29 @@ export const SignUp = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    axio
-      .post(
-        url + "signup",
-        {
-          user: {
-            email: email,
-            password: password,
-            password_confirmation: password_confirmaton,
-            firstname: firstname,
-            lastname: lastname,
-          },
-        },
-        { withCredentials: true }
-      )
-      .then((response) => {
-        console.log(response.data);
-        setLogged(response.data.logged_in);
-        localStorage.setItem("tkn", response.data.tkn);
+    if (password !== password_confirmaton) {
+      alert("passwords don't match");
+    }
+    setLoading(true);
+    apolloClient
+      .mutate({
+        mutation: signUp(name, email, password),
       })
-      .catch((error) => {
-        console.log(error);
+      .then((res) => {
+        setLoading(false);
+        console.log(res.data);
+        setData(res.data.signUp);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(true);
+        console.log(err);
       });
   };
 
-  if (logged) return <Navigate to={"/Dashhoard"} />;
+  if (logged) {
+    return <Navigate to={"/Dashhoard"} />;
+  }
 
   const HandleEmail = (e) => {
     setemail(e.target.value);
@@ -55,12 +55,21 @@ export const SignUp = () => {
   const HandlePasswordC = (e) => {
     setpassword_confirmaton(e.target.value);
   };
-  const HandleFN = (e) => {
-    setfirstname(e.target.value);
+  const HandleN = (e) => {
+    setName(e.target.value);
   };
-  const HandleLN = (e) => {
-    setlastname(e.target.value);
-  };
+
+  if (loading) return "Loading...";
+  if (error) return `Error Signing up! ${error}`;
+  if (data) {
+    const { token, user } = data;
+    localStorage.setItem("JWT", token);
+    setJWT(token);
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+    setLogged(true);
+    return <Navigate to={"/Dashboard"} />;
+  }
 
   return (
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -69,6 +78,14 @@ export const SignUp = () => {
         <div className="col-sm">Sign up</div>
         <div className="col-sm">
           <form onSubmit={handleSubmit}>
+            <div className="form-group my-2">
+              <input
+                type="text"
+                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                placeholder="Name"
+                onChange={HandleN}
+              />
+            </div>
             <div className="form-group my-2">
               <input
                 type="email"
@@ -91,22 +108,6 @@ export const SignUp = () => {
                 className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 placeholder="Password confirmation"
                 onChange={HandlePasswordC}
-              />
-            </div>
-            <div className="form-group my-2">
-              <input
-                type="text"
-                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="First name"
-                onChange={HandleFN}
-              />
-            </div>
-            <div className="form-group my-2">
-              <input
-                type="text"
-                className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="Last name"
-                onChange={HandleLN}
               />
             </div>
             <div className="form-group my-2">

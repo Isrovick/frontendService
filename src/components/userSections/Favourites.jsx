@@ -5,18 +5,17 @@ import { findAll } from "../../gql/queries";
 import { useQuery } from "@apollo/client";
 import { RepoList } from "../pageSections/RepoList";
 
-export const Dashboard = () => {
+export const Favourites = () => {
   const { logged, user } = useMain();
   const { setAct } = useMainUpdate();
 
   if (!logged) {
     return <Navigate to={"/Login"} />;
   }
-
   const { loading, error, data } = useQuery(findAll(user.id));
 
   useEffect(() => {
-    setAct("Dashboard");
+    setAct("Favourites");
   }, []);
 
   if (loading) return "Loading...";
@@ -30,10 +29,12 @@ export const Dashboard = () => {
       </div>
     );
   }
-
   return (
     <div>
-      <RepoList _repos={data.findAll} _favs={false} />
+      <RepoList
+        _repos={data.findAll.filter((repo) => repo.favourite)}
+        _favs={true}
+      />
     </div>
   );
 };

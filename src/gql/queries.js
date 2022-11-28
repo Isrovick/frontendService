@@ -40,8 +40,10 @@ export const signUp = (name, email, password) => {
             password:"${password}",
         }){
             user{
+                id
                 name
                 email
+                profilePictureUrl
             }
             token
         }

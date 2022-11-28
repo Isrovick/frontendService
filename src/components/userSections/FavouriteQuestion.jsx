@@ -1,41 +1,51 @@
-import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 import { useMain, useMainUpdate } from "../../mainContext";
+import { apolloClient } from "../../index";
+import { setFavourite } from "../../gql/queries";
 
-export const Logout = () => {
-  const [flag, setFlag] = useState(0);
-  const { logged, JWT } = useMain();
-  const { setLogged, setJWT, setAct, setUser } = useMainUpdate();
+export const FavouriteQuestion = () => {
+  const { logged } = useMain();
+  const { setAct } = useMainUpdate();
+  const { idUser, name, flag } = useParams();
+  const [action, setAction] = useState(0);
+  if (!logged) {
+    return <Navigate to={"/login"} />;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
   };
   const handleYes = () => {
-    setFlag(1);
+    setAction(1);
   };
 
   const handleNo = () => {
-    setFlag(2);
+    setAction(2);
   };
 
   useEffect(() => {
-    setAct("Log Out");
-    if (flag === 1) {
-      localStorage.removeItem("JWT", null);
-      setJWT(null);
-      localStorage.removeItem("user", null);
-      setUser(null);
-      setLogged(false);
-    }
-  }, [flag, logged, JWT]);
+    setAct("Favourite Question");
+  }, [action, logged]);
 
-  if (!logged || flag === 1) {
-    return <Navigate to={"/login"} />;
+  if (action) {
+    console.log(flag);
+    if (action === 1)
+      apolloClient
+        .mutate({
+          mutation: setFavourite(idUser, name),
+        })
+        .then((res) => {
+          console.log(res);
+          return <Navigate to={"/Dashboard"} />;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+    return "Loading...";
   }
 
-  if (logged && flag === 2) {
-    return <Navigate to={"/Dashboard"} />;
-  }
   return (
     <div>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -45,7 +55,17 @@ export const Logout = () => {
           <div className="col-sm">
             <form onSubmit={handleSubmit}>
               <div className="form-group my-2">
-                Are you Sure you want to logout?
+                {flag ? (
+                  <div className="form-group my-2">
+                    Are you Sure you want to add "{name}" to your favourite
+                    repos?
+                  </div>
+                ) : (
+                  <div className="form-group my-2">
+                    Are you Sure you want to Remove "{name}" to your favourite
+                    repos?
+                  </div>
+                )}
               </div>
               <div className="form-group my-2" />
               <div className="form-group my-2">
