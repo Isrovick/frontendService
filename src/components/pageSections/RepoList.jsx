@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useMain } from "../../mainContext";
 import { apolloClient } from "../../index";
@@ -7,9 +7,12 @@ import { findAll, setFavourite } from "../../gql/queries";
 export const RepoList = ({ _repos, _favs }) => {
   const { logged, user } = useMain();
   const [repos, setRepos] = useState(_repos);
-
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
   if (!logged) return <Navigate to={"/login"} />;
 
+  useEffect(() => {
+    console.log(useEffect.name);
+  }, [ignored]);
   const fetchRepos = async (fav = false) => {
     await apolloClient
       .query({
@@ -19,6 +22,8 @@ export const RepoList = ({ _repos, _favs }) => {
         let newRepos = res.data.findAll;
         if (fav) newRepos = newRepos.filter((repo) => repo.favourite);
         setRepos(newRepos);
+        forceUpdate();
+        console.log(fetchRepos.name);
       })
       .catch((err) => {
         console.log(err);
@@ -41,7 +46,7 @@ export const RepoList = ({ _repos, _favs }) => {
   return (
     <ul role="list" className="-my-6 divide-y divide-gray-200">
       {repos.map((repo, index) => (
-        <li key={repo.name} className="flex py-6">
+        <li key={index} className="flex py-6">
           <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md"></div>
           {repo.isPrivate ? (
             <svg

@@ -17,16 +17,15 @@ export function MainProvider({ children }) {
   const [url] = useState(process.env.BACKEND_URL);
   const [JWT, setJWT] = useState(localStorage.getItem("JWT"));
   const [act, setAct] = useState("Dashboard");
-  const [fav, setFav] = useState({});
+
   return (
-    <MainContext.Provider value={{ logged, user, url, JWT, act, fav }}>
+    <MainContext.Provider value={{ logged, user, url, JWT, act }}>
       <MainUpdateContext.Provider
         value={{
           setLogged,
           setJWT,
           setAct,
           setUser,
-          setFav,
         }}
       >
         {children}
