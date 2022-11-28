@@ -19,9 +19,21 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+const DefaultOptions = {
+  watchQuery: {
+    fetchPolicy: "no-cache",
+    errorPolicy: "ignore",
+  },
+  query: {
+    fetchPolicy: "no-cache",
+    errorPolicy: "all",
+  },
+};
+
 export const apolloClient = new ApolloClient({
   link: concat(authMiddleware, httpLink),
   cache: new InMemoryCache(),
+  defaultOptions: DefaultOptions,
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
