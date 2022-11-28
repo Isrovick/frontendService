@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useMain, useMainUpdate } from "../../mainContext";
 import axio from "axios";
+import { Navigate } from "react-router-dom";
 
 export const SignUp = () => {
   const [email, setemail] = useState("");
@@ -10,7 +11,7 @@ export const SignUp = () => {
   const [lastname, setlastname] = useState("");
 
   const { logged, url } = useMain();
-  const { setlogged, setAct } = useMainUpdate();
+  const { setLogged, setAct } = useMainUpdate();
 
   useEffect(() => {
     setAct("Sign up");
@@ -35,13 +36,15 @@ export const SignUp = () => {
       )
       .then((response) => {
         console.log(response.data);
-        setlogged(response.data.logged_in);
+        setLogged(response.data.logged_in);
         localStorage.setItem("tkn", response.data.tkn);
       })
       .catch((error) => {
         console.log(error);
       });
   };
+
+  if (logged) return <Navigate to={"/Dashhoard"} />;
 
   const HandleEmail = (e) => {
     setemail(e.target.value);

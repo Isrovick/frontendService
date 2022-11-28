@@ -1,6 +1,6 @@
-import React, { Component, useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { useMain, useMainUpdate } from "../../mainContext";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useMain } from "../../mainContext";
 import { Disclosure } from "@headlessui/react";
 import { ArrowLeftOnRectangleIcon } from "@heroicons/react/24/outline";
 
@@ -66,7 +66,10 @@ export const Header = () => {
                       <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
-                          src={user ? user.imageUrl : null}
+                          src={
+                            user.profilePictureUrl ||
+                            "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+                          }
                           alt=""
                         />
                       </div>

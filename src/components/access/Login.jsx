@@ -1,45 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useMain, useMainUpdate } from "../../mainContext";
-import axio from "axios";
 import { Navigate } from "react-router-dom";
+import { useLazyQuery } from "@apollo/client";
+import { login } from "../../gql/queries";
 
 export const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
 
-  const { logged, url } = useMain();
-  const { setlogged, setname, setAct } = useMainUpdate();
+  const { logged } = useMain();
+  const { setLogged, setAct, setUser, setJWT } = useMainUpdate();
+  const [getLazyQuery, { data, loading, error }] = useLazyQuery(
+    login(email, password)
+  );
 
   useEffect(() => {
     setAct("Log In");
-  }, []);
+  }, [data, loading, error]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    axio
-      .post(
-        url + "login",
-        {
-          headers: {},
-          user: {
-            email: email,
-            password: password,
-          },
-        },
-        { withCredentials: true }
-      )
-      .then((response) => {
-        setlogged(response.data.logged_in);
-        setname(response.data.name);
-        localStorage.setItem("tkn", response.data.tkn);
-        localStorage.setItem("name", response.data.name);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    getLazyQuery();
   };
-
   const HandleEmail = (e) => {
     setemail(e.target.value);
   };
@@ -51,7 +33,17 @@ export const Login = () => {
   if (logged) {
     return <Navigate to={"/Dashboard"} />;
   }
-
+  if (loading) return "LOADING";
+  if (error) return `Error! ${error}`;
+  if (data) {
+    const { token, user } = data.login;
+    localStorage.setItem("JWT", token);
+    setJWT(token);
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+    setLogged(true);
+    return <Navigate to={"/Dashboard"} />;
+  }
   return (
     <div>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

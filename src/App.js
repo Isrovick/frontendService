@@ -1,12 +1,12 @@
-import './App.css';
-import { Subapp } from './components/Ssubapp.jsx'
-import { MainProvider } from './mainContext.jsx'
+import "./App.css";
+import { Subapp } from "./components/Ssubapp.jsx";
+import { MainProvider } from "./mainContext.jsx";
 
 function App() {
   return (
-      <MainProvider>
-        <Subapp></Subapp>
-      </MainProvider>
+    <MainProvider>
+      <Subapp></Subapp>
+    </MainProvider>
   );
 }
 

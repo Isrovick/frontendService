@@ -1,10 +1,9 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useMain, useMainUpdate } from "../../mainContext";
+import { useMain } from "../../mainContext";
 
 export const Home = () => {
-  const { logged, url, tkn } = useMain();
-  const { setlogged } = useMainUpdate();
+  const { logged } = useMain();
 
   if (logged) {
     return <Navigate to={"/Dashhoard"} />;

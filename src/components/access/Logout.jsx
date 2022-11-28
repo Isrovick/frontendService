@@ -5,8 +5,7 @@ import { useMain, useMainUpdate } from "../../mainContext";
 export const Logout = () => {
   const [flag, setFlag] = useState(0);
   const { logged, JWT } = useMain();
-  const { setlogged, setJWT, setSections, updateSections, setAct, setUser } =
-    useMainUpdate();
+  const { setLogged, setJWT, setAct, setUser } = useMainUpdate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,19 +20,20 @@ export const Logout = () => {
 
   useEffect(() => {
     setAct("Log Out");
-    if (flag == 1) {
-      localStorage.setItem("tkn", null);
-      setlogged(false);
+    if (flag === 1) {
+      localStorage.setItem("JWT", null);
       setJWT(null);
+      localStorage.setItem("user", null);
       setUser(null);
+      setLogged(false);
     }
   }, [flag, logged, JWT]);
 
-  if (!logged || flag == 1) {
+  if (!logged || flag === 1) {
     return <Navigate to={"/login"} />;
   }
 
-  if (logged && flag == 2) {
+  if (logged && flag === 2) {
     return <Navigate to={"/Dashboard"} />;
   }
   return (
