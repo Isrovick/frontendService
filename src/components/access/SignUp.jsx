@@ -37,7 +37,7 @@ export const SignUp = () => {
       })
       .catch((err) => {
         setLoading(false);
-        setError(true);
+        setError(err);
         console.log(err);
       });
   };
