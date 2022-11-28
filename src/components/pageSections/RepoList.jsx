@@ -10,38 +10,28 @@ export const RepoList = ({ _repos, _favs }) => {
   const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
   if (!logged) return <Navigate to={"/login"} />;
 
-  useEffect(() => {
-    console.log(useEffect.name);
-  }, [ignored]);
-  const fetchRepos = async (fav = false) => {
-    await apolloClient
-      .query({
-        query: findAll(user.id),
-      })
-      .then((res) => {
-        let newRepos = res.data.findAll;
-        if (fav) newRepos = newRepos.filter((repo) => repo.favourite);
-        setRepos(newRepos);
-        forceUpdate();
-        console.log(fetchRepos.name);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  useEffect(() => {}, [ignored]);
 
   const handleFavourite = (id, name, index) => {
     apolloClient
       .mutate({
         mutation: setFavourite(id, name),
       })
-      .then((res) => {
-        console.log(handleFavourite.name);
-        fetchRepos(_favs);
-      })
+      .then((res) => {})
       .catch((err) => {
         console.log(err);
       });
+    let newRepos = repos.map((repo) => {
+      if (repo.idUser === id && repo.name === name) {
+        repo.favourite = !repo.favourite;
+      }
+      return repo;
+    });
+    if (_favs) {
+      newRepos = newRepos.filter((repo) => repo.favourite);
+    }
+    setRepos(newRepos);
+    forceUpdate();
   };
   return (
     <ul role="list" className="-my-6 divide-y divide-gray-200">
